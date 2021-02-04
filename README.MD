@@ -14,7 +14,40 @@ It works no matter how your application is running:
 * Works on the 3 major platforms: **Windows**, **MacOS**, **Linux**
 
 ### Installation
-...
+
+#### Maven example
+
+```xml
+<repositories>
+    <repository>
+        <id>jitpack.io</id>
+        <url>https://jitpack.io</url>
+    </repository>
+</repositories>
+```
+
+```xml
+<dependency>
+    <groupId>com.github.Dansoftowner</groupId>
+    <artifactId>Restart4j</artifactId>
+    <version>1.0</version>
+</dependency>
+```
+
+#### Gradle example
+
+```groovy
+repositories {
+    ...
+    maven { url 'https://jitpack.io' }
+}
+```
+
+```groovy
+dependencies {
+    implementation 'com.github.Dansoftowner:Restart4j:1.0'
+}
+```
 
 ### Some code examples
 
