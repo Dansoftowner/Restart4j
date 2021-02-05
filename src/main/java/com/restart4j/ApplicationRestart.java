@@ -13,7 +13,7 @@ import java.util.Optional;
 import java.util.function.Function;
 
 /**
- * A customizable structure for restarting the application.
+ * For restarting the application.
  * An {@link ApplicationRestart} can be created through builder api.
  *
  * @author Daniel Gyorffy
@@ -60,10 +60,9 @@ public final class ApplicationRestart {
     public void restartApp() throws RestartException {
         try {
             Optional<OSProcess> appProcess = getAppProcess();
-            if (appProcess.isPresent()) {
-                Optional.ofNullable(this.beforeNewProcessCreated).orElse(EMPTY_RUNNABLE).run();
-                Runtime.getRuntime().exec(getCommandLine(appProcess.get()));
-            } else throw new RestartException("Couldn't identify the process by PID");
+            OSProcess raw = appProcess.orElseThrow(() -> new RestartException("Couldn't identify the process by PID"));
+            Optional.ofNullable(this.beforeNewProcessCreated).orElse(EMPTY_RUNNABLE).run();
+            Runtime.getRuntime().exec(getCommandLine(raw));
             Optional.ofNullable(beforeCurrentProcessTerminated).orElse(EMPTY_RUNNABLE).run();
             Optional.ofNullable(terminationPolicy).orElse(() -> System.exit(0)).run();
         } catch (IOException e) {
