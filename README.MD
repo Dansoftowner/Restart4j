@@ -73,6 +73,9 @@ Two demo applications can be found in the project:
 
 ![Running SimpleDemo](demo/SimpleDemo.gif)
 
+# Projects using `Restart4j`
+If this library is used by your project, let me know in the `Discussions` and I will mention that in this section.
+
 ### Used libraries
 
  * [SLF4j](http://www.slf4j.org/) - Simple Logging Facade for java
