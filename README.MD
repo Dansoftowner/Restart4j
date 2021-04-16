@@ -1,5 +1,10 @@
 # Restart4j
 
+[![](https://jitpack.io/v/Dansoftowner/Restart4j.svg)](https://jitpack.io/#Dansoftowner/Restart4j)
+[![GitHub last commit](https://img.shields.io/github/last-commit/Dansoftowner/Restart4j)](https://github.com/Dansoftowner/Restart4j/commits/master)
+[![GitHub issues](https://img.shields.io/github/issues/Dansoftowner/Restart4j)](https://github.com/Dansoftowner/Restart4j/issues)
+[![GitHub](https://img.shields.io/github/license/Dansoftowner/Restart4j)](LICENSE)
+
 Library for restarting your JVM application.
 You will most likely use it for restarting your GUI application programmatically.
 
