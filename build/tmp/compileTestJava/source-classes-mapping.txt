@@ -1,4 +1,0 @@
-com/restart4j/ComplexDemo.java
- com.restart4j.ComplexDemo
-com/restart4j/SimpleDemo.java
- com.restart4j.SimpleDemo
