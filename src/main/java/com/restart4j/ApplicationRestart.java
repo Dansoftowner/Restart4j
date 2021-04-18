@@ -79,6 +79,8 @@ public final class ApplicationRestart {
 
     private String getCommandLine(@NotNull OSProcess osProcess) {
         String commandLine = osProcess.getCommandLine();
+        if (commandLine == null || commandLine.isEmpty())
+            throw new RestartException("Couldn't retrieve command-line (it's empty or null)");
         final PlatformEnum platform = SystemInfo.getCurrentPlatformEnum();
         if (platform == PlatformEnum.LINUX || platform == PlatformEnum.MACOSX)
             commandLine = commandLine.replace(NUL_CHAR, SPACE);
