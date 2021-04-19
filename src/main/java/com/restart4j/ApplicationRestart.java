@@ -22,7 +22,8 @@ public final class ApplicationRestart {
 
     private static final Logger logger = LoggerFactory.getLogger(ApplicationRestart.class);
 
-    private static final Runnable EMPTY_RUNNABLE = () -> {};
+    private static final Runnable EMPTY_RUNNABLE = () -> {
+    };
     private static final Function<String, String> EMPTY_FUNCTION = it -> it;
 
     private static final char NUL_CHAR = '\00';
@@ -58,16 +59,23 @@ public final class ApplicationRestart {
     }
 
     public void restartApp() throws RestartException {
-        try {
-            Optional<OSProcess> appProcess = getAppProcess();
-            OSProcess raw = appProcess.orElseThrow(() -> new RestartException("Couldn't identify the process by PID"));
+        Optional<OSProcess> appProcess = getAppProcess();
+        OSProcess raw = appProcess.orElseThrow(() -> new RestartException("Couldn't identify the process by PID"));
+        String commandLine = getCommandLine(raw);
+        buildNewProcessCreation(commandLine);
+        Optional.ofNullable(beforeCurrentProcessTerminated).orElse(EMPTY_RUNNABLE).run();
+        Optional.ofNullable(terminationPolicy).orElse(() -> System.exit(0)).run();
+    }
+
+    private void buildNewProcessCreation(String commandLine) {
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             Optional.ofNullable(this.beforeNewProcessCreated).orElse(EMPTY_RUNNABLE).run();
-            Runtime.getRuntime().exec(getCommandLine(raw));
-            Optional.ofNullable(beforeCurrentProcessTerminated).orElse(EMPTY_RUNNABLE).run();
-            Optional.ofNullable(terminationPolicy).orElse(() -> System.exit(0)).run();
-        } catch (IOException e) {
-            throw new RestartException("Couldn't execute the starter command with the OS", e);
-        }
+            try {
+                Runtime.getRuntime().exec(commandLine);
+            } catch (IOException e) {
+                throw new RestartException("Couldn't execute the starter command with the OS", e);
+            }
+        }));
     }
 
     private Optional<OSProcess> getAppProcess() {
