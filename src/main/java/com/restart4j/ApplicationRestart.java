@@ -79,18 +79,26 @@ public final class ApplicationRestart {
         switch (SystemInfo.getCurrentPlatform()) {
             case LINUX:
             case MACOS:
-                try {
-                    Runtime.getRuntime().exec(commandLine.split(NUL_CHAR));
-                } catch (IOException e) {
-                    throw new RestartException(String.format("Couldn't execute the starter command with the OS: %s", commandLine), e);
-                }
+                execArray(commandLine.split(NUL_CHAR));
             default:
-                try {
-                    Runtime.getRuntime().exec(commandLine);
-                } catch (IOException e) {
-                    throw new RestartException(String.format("Couldn't execute the starter command with the OS: %s", commandLine), e);
-                }
+                execString(commandLine);
                 break;
+        }
+    }
+
+    private void execArray(String[] cmdArray) {
+        try {
+            Runtime.getRuntime().exec(cmdArray);
+        } catch (IOException e) {
+            throw new RestartException(String.format("Couldn't execute the starter command with the OS: %s", Arrays.toString(cmdArray)), e);
+        }
+    }
+
+    private void execString(String cmd) {
+        try {
+            Runtime.getRuntime().exec(cmd);
+        } catch (IOException e) {
+            throw new RestartException(String.format("Couldn't execute the starter command with the OS: %s", cmd), e);
         }
     }
 
@@ -105,9 +113,6 @@ public final class ApplicationRestart {
         String commandLine = osProcess.getCommandLine();
         if (commandLine == null || commandLine.isEmpty())
             throw new RestartException("Couldn't retrieve command-line (it's empty or null)");
-        final PlatformEnum platform = SystemInfo.getCurrentPlatform();
-        /*if (platform == PlatformEnum.LINUX || platform == PlatformEnum.MACOS)
-            commandLine = commandLine.replace(NUL_CHAR, SPACE);*/
         return Optional.ofNullable(this.cmdModifier)
                 .orElse(EMPTY_FUNCTION)
                 .apply(commandLine);
