@@ -9,6 +9,7 @@ import oshi.software.os.OSProcess;
 import oshi.software.os.OperatingSystem;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Optional;
 import java.util.function.Function;
 
@@ -26,7 +27,7 @@ public final class ApplicationRestart {
     };
     private static final Function<String, String> EMPTY_FUNCTION = it -> it;
 
-    private static final char NUL_CHAR = '\00';
+    private static final String NUL_CHAR = "\00";
     private static final char SPACE = '\u0020';
 
     private final Runnable beforeNewProcessCreated;
@@ -70,12 +71,27 @@ public final class ApplicationRestart {
     private void buildNewProcessCreation(String commandLine) {
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             Optional.ofNullable(this.beforeNewProcessCreated).orElse(EMPTY_RUNNABLE).run();
-            try {
-                Runtime.getRuntime().exec(commandLine);
-            } catch (IOException e) {
-                throw new RestartException("Couldn't execute the starter command with the OS", e);
-            }
+            exec(commandLine);
         }));
+    }
+
+    private void exec(String commandLine) throws RestartException {
+        switch (SystemInfo.getCurrentPlatform()) {
+            case LINUX:
+            case MACOS:
+                try {
+                    Runtime.getRuntime().exec(commandLine.split(NUL_CHAR));
+                } catch (IOException e) {
+                    throw new RestartException(String.format("Couldn't execute the starter command with the OS: %s", commandLine), e);
+                }
+            default:
+                try {
+                    Runtime.getRuntime().exec(commandLine);
+                } catch (IOException e) {
+                    throw new RestartException(String.format("Couldn't execute the starter command with the OS: %s", commandLine), e);
+                }
+                break;
+        }
     }
 
     private Optional<OSProcess> getAppProcess() {
@@ -89,9 +105,9 @@ public final class ApplicationRestart {
         String commandLine = osProcess.getCommandLine();
         if (commandLine == null || commandLine.isEmpty())
             throw new RestartException("Couldn't retrieve command-line (it's empty or null)");
-        final PlatformEnum platform = SystemInfo.getCurrentPlatformEnum();
-        if (platform == PlatformEnum.LINUX || platform == PlatformEnum.MACOSX)
-            commandLine = commandLine.replace(NUL_CHAR, SPACE);
+        final PlatformEnum platform = SystemInfo.getCurrentPlatform();
+        /*if (platform == PlatformEnum.LINUX || platform == PlatformEnum.MACOS)
+            commandLine = commandLine.replace(NUL_CHAR, SPACE);*/
         return Optional.ofNullable(this.cmdModifier)
                 .orElse(EMPTY_FUNCTION)
                 .apply(commandLine);
