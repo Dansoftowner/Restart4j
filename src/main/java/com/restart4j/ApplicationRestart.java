@@ -80,6 +80,7 @@ public final class ApplicationRestart {
             case LINUX:
             case MACOS:
                 execArray(commandLine.split(NUL_CHAR));
+                break;
             default:
                 execString(commandLine);
                 break;
