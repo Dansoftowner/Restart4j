@@ -81,6 +81,8 @@ Two demo applications can be found in the project:
 # Projects using `Restart4j`
 If this library is used by your project, let me know in the `Discussions` and I will mention that in this section.
 
+* [Document Archiver](https://github.com/Document-Archiver/com.sophisticatedapps.archiving.document-archiver) - Archive all your documents in a consistent way, which enables you to retrieve them later fast and easy.
+
 ### Used libraries
 
  * [SLF4j](http://www.slf4j.org/) - Simple Logging Facade for java
