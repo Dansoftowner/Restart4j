@@ -1,5 +1,6 @@
 package com.restart4j;
 
+import org.codehaus.plexus.util.cli.CommandLineUtils;
 import oshi.PlatformEnum;
 import oshi.SystemInfo;
 
@@ -71,7 +72,7 @@ public abstract class CommandLineExecutor {
             }
         }
 
-        @Override
+        /*@Override
         String formatCommandLine(String commandLine) {
             List<Character> quotes = Arrays.asList('"', '\'');
             boolean inQuote = false;
@@ -92,7 +93,7 @@ public abstract class CommandLineExecutor {
                 }
             }
             return formattedCommand.toString();
-        }
+        }*/
     }
 
 }
