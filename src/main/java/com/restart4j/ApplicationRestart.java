@@ -3,15 +3,13 @@ package com.restart4j;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import oshi.PlatformEnum;
 import oshi.SystemInfo;
 import oshi.software.os.OSProcess;
 import oshi.software.os.OperatingSystem;
 
-import java.io.IOException;
-import java.util.Arrays;
 import java.util.Optional;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 /**
  * For restarting the application.
@@ -34,19 +32,18 @@ public final class ApplicationRestart {
     private final Runnable beforeCurrentProcessTerminated;
     private final Runnable terminationPolicy;
 
+    private final Supplier<CommandLineExecutor> executorFactory;
     private final Function<String, String> cmdModifier;
-
-    private ApplicationRestart() {
-        this(null, null, null, null);
-    }
 
     private ApplicationRestart(Runnable beforeNewProcessCreated,
                                Runnable beforeCurrentProcessTerminated,
                                Runnable terminationPolicy,
+                               Supplier<CommandLineExecutor> executorFactory,
                                Function<String, String> cmdModifier) {
         this.beforeNewProcessCreated = beforeNewProcessCreated;
         this.beforeCurrentProcessTerminated = beforeCurrentProcessTerminated;
         this.terminationPolicy = terminationPolicy;
+        this.executorFactory = executorFactory;
         this.cmdModifier = cmdModifier;
     }
 
@@ -55,6 +52,7 @@ public final class ApplicationRestart {
                 builder.beforeNewProcessCreated,
                 builder.beforeCurrentProcessTerminated,
                 builder.terminationPolicy,
+                builder.executorFactory,
                 builder.cmdModifier
         );
     }
@@ -76,31 +74,10 @@ public final class ApplicationRestart {
     }
 
     private void exec(String commandLine) throws RestartException {
-        switch (SystemInfo.getCurrentPlatform()) {
-            case LINUX:
-            case MACOS:
-                execArray(commandLine.split(NUL_CHAR));
-                break;
-            default:
-                execString(commandLine);
-                break;
-        }
-    }
-
-    private void execArray(String[] cmdArray) {
-        try {
-            Runtime.getRuntime().exec(cmdArray);
-        } catch (IOException e) {
-            throw new RestartException(String.format("Couldn't execute the starter command with the OS: %s", Arrays.toString(cmdArray)), e);
-        }
-    }
-
-    private void execString(String cmd) {
-        try {
-            Runtime.getRuntime().exec(cmd);
-        } catch (IOException e) {
-            throw new RestartException(String.format("Couldn't execute the starter command with the OS: %s", cmd), e);
-        }
+        Optional.ofNullable(executorFactory)
+                .orElse(CommandLineExecutor::getDefaultExecutor)
+                .get()
+                .exec(commandLine);
     }
 
     private Optional<OSProcess> getAppProcess() {
@@ -129,6 +106,7 @@ public final class ApplicationRestart {
         private Runnable beforeCurrentProcessTerminated;
         private Runnable terminationPolicy;
 
+        private Supplier<CommandLineExecutor> executorFactory;
         private Function<String, String> cmdModifier;
 
         private Builder() {
@@ -151,6 +129,11 @@ public final class ApplicationRestart {
 
         public Builder modifyCmd(Function<String, String> cmdModifier) {
             this.cmdModifier = cmdModifier;
+            return this;
+        }
+
+        public Builder executorFactory(Supplier<CommandLineExecutor> executorFactory) {
+            this.executorFactory = executorFactory;
             return this;
         }
 
