@@ -1,13 +1,11 @@
 package com.restart4j;
 
-import org.codehaus.plexus.util.cli.CommandLineUtils;
 import oshi.PlatformEnum;
 import oshi.SystemInfo;
 
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
 
