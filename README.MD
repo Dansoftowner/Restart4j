@@ -35,7 +35,7 @@ It works no matter how your application is running:
 <dependency>
     <groupId>com.github.Dansoftowner</groupId>
     <artifactId>Restart4j</artifactId>
-    <version>1.0</version>
+    <version>1.4.7</version>
 </dependency>
 ```
 
@@ -50,7 +50,7 @@ repositories {
 
 ```groovy
 dependencies {
-    implementation 'com.github.Dansoftowner:Restart4j:1.0'
+    implementation 'com.github.Dansoftowner:Restart4j:1.4.7'
 }
 ```
 
